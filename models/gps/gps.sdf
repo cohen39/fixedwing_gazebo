@@ -5,14 +5,14 @@
       <pose>0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
-        <mass>0.015</mass>
+        <mass>1e-03</mass>
         <inertia>
-          <ixx>1e-05</ixx>
+          <ixx>1e-06</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>1e-05</iyy>
+          <iyy>1e-06</iyy>
           <iyz>0</iyz>
-          <izz>1e-05</izz>
+          <izz>1e-06</izz>
         </inertia>
       </inertial>
       <visual name="visual">

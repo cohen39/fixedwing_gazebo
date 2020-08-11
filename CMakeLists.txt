@@ -178,6 +178,13 @@ target_link_libraries(LiftDragPlugin2
   ${GAZEBO_LIBRARIES}
 )
 
+add_library(LiftDragPluginWhole
+  src/fixedwing_gazebo/LiftDragPluginWhole.cc
+)
+target_link_libraries(LiftDragPluginWhole
+  ${GAZEBO_LIBRARIES}
+)
+
 #############
 ## Install ##
 #############

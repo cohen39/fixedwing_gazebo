@@ -90,7 +90,7 @@
 
     <link name='wheel_left'>
       <inertial>
-        <pose>-0.155 0.04 -0.068 0.17 0 0</pose>
+        <pose>-0.13 0.04 -0.068 0.17 0 0</pose>
         <mass>0.004</mass>
         <inertia>
           <ixx>1.49e-4</ixx>
@@ -112,7 +112,7 @@
         </material>
       </visual>
       <collision name='collision'>
-        <pose>-0.155 0.04 -0.068 1.74 0 0</pose>
+        <pose>-0.13 0.04 -0.068 1.74 0 0</pose>
         <geometry>
           <cylinder> 
             <radius>0.035</radius>
@@ -138,7 +138,7 @@
     </link>
 
     <joint name='wheel_left_joint' type='revolute'>
-      <pose>-0.155 0.04 -0.068 0.17 0 0</pose>
+      <pose>-0.13 0.04 -0.068 0.17 0 0</pose>
       <parent>fuselage</parent>
       <child>wheel_left</child>
       <axis>
@@ -156,7 +156,7 @@
 
     <link name='wheel_right'>
       <inertial>
-        <pose>-0.155 -0.04 -0.068 -0.17 0 0</pose>
+        <pose>-0.13 -0.04 -0.068 -0.17 0 0</pose>
         <mass>0.004</mass>
         <inertia>
           <ixx>1.49e-4</ixx>
@@ -178,7 +178,7 @@
         </material>
       </visual>
       <collision name='collision'>
-        <pose>-0.155 -0.04 -0.068 1.4 0 0</pose>
+        <pose>-0.13 -0.04 -0.068 1.4 0 0</pose>
         <geometry>
           <cylinder> 
             <radius>0.035</radius>
@@ -203,7 +203,7 @@
     </link>
 
     <joint name='wheel_right_joint' type='revolute'>
-      <pose>-0.155 -0.04 -0.068 -0.17 0 0</pose>
+      <pose>-0.13 -0.04 -0.068 -0.17 0 0</pose>
       <parent>fuselage</parent>
       <child>wheel_right</child>
       <axis>
@@ -623,14 +623,14 @@
       <pose>0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
-        <mass>0.015</mass>
+        <mass>1e-6</mass>
         <inertia>
-          <ixx>1e-05</ixx>
+          <ixx>1e-06</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>1e-05</iyy>
+          <iyy>1e-06</iyy>
           <iyz>0</iyz>
-          <izz>1e-05</izz>
+          <izz>1e-06</izz>
         </inertia>
       </inertial>
     </link>

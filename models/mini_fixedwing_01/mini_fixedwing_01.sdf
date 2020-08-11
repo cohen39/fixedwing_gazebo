@@ -559,14 +559,14 @@
       <pose>0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
-        <mass>0.015</mass>
+        <mass>1e-6</mass>
         <inertia>
-          <ixx>1e-05</ixx>
+          <ixx>1e-06</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>1e-05</iyy>
+          <iyy>1e-06</iyy>
           <iyz>0</iyz>
-          <izz>1e-05</izz>
+          <izz>1e-06</izz>
         </inertia>
       </inertial>
     </link>
@@ -642,7 +642,7 @@
       <capacity>850</capacity>
       <axis_num>0</axis_num>
       <motor_eff>0.7</motor_eff>
-      <verbose>1</verbose>
+      <verbose>0</verbose>
     </plugin>
 
     <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>

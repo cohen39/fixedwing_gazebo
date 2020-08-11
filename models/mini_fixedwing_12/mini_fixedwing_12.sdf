@@ -56,7 +56,7 @@
         </geometry>
       </visual>
       <visual name='cp_htail'>
-        <pose>-0.36 0 0.015 3.14 0 0</pose>
+        <pose>-0.36 0 0.015 0 0.17452 0</pose>
         <geometry>
           <mesh>
             <scale>0.1 0.1 0.1</scale>
@@ -449,7 +449,7 @@
       <cma>0</cma>
       <cD0>0.03</cD0>
       <kcDcL>0.1</kcDcL>
-      <alpha_stall>0.122</alpha_stall>
+      <alpha_stall>0.3</alpha_stall>
       <cLa_stall>-1.27</cLa_stall>
       <cma_stall>0</cma_stall>
       <area>0.06</area>
@@ -472,7 +472,7 @@
       <cma>0</cma>
       <cD0>0.03</cD0>
       <kcDcL>0.1</kcDcL>
-      <alpha_stall>0.122</alpha_stall>
+      <alpha_stall>0.3</alpha_stall>
       <cLa_stall>-1.27</cLa_stall>
       <cma_stall>0</cma_stall>
       <area>0.06</area>
@@ -505,7 +505,7 @@
 
     <plugin name='htail' filename='libLiftDragPlugin2.so'>
       <link_name>fuselage</link_name>
-      <pose>-0.36 0 0.015 3.14 0 0</pose>
+      <pose>-0.36 0 0.015 0 0.17452 0</pose>
       <cL0>0</cL0>
       <cLa>5.73</cLa>
       <cm0>0</cm0>
@@ -560,7 +560,7 @@
       <pose>0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
-        <mass>0.015</mass>
+        <mass>1e-5</mass>
         <inertia>
           <ixx>1e-05</ixx>
           <ixy>0</ixy>

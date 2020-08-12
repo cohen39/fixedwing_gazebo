@@ -54,6 +54,7 @@ LiftDragPluginWhole::LiftDragPluginWhole()
   this->crp =  0;
   this->crb =  0;
   this->cnb =  0;
+  this->cnr =  0;
   this->cndr =  0;
   this->forward = ignition::math::Vector3d(1, 0, 0);
   this->upward = ignition::math::Vector3d(0, 0, 1);
@@ -61,6 +62,11 @@ LiftDragPluginWhole::LiftDragPluginWhole()
   this->alpha = 0;
   this->sweep = 0;
   this->velocityStall = 0;
+
+  dal = -1;
+  dar = -1;
+  de = -1;
+  dr = -1;
 
   // 90 deg stall
   this->alphaStall = 0.5*M_PI;
@@ -168,6 +174,9 @@ void LiftDragPluginWhole::Load(physics::ModelPtr _model,
   if (_sdf->HasElement("cnb"))
     this->cnb = _sdf->Get<double>("cnb");
 
+  if (_sdf->HasElement("cnr"))
+    this->cndr = _sdf->Get<double>("cnr");
+
   if (_sdf->HasElement("cndr"))
     this->cndr = _sdf->Get<double>("cndr");
 
@@ -230,6 +239,8 @@ void LiftDragPluginWhole::Load(physics::ModelPtr _model,
     {
       gzerr << "Joint with name[" << lAileronJointName << "] does not exist.\n";
     }
+    else
+      gzerr << "Joint [" << lAileronJointName << "] connected as lAileronJoint.\n";
   }
 
   if (_sdf->HasElement("right_elevon_name"))
@@ -240,6 +251,8 @@ void LiftDragPluginWhole::Load(physics::ModelPtr _model,
     {
       gzerr << "Joint with name[" << rAileronJointName << "] does not exist.\n";
     }
+    else
+      gzerr << "Joint [" << rAileronJointName << "] connected as rAileronJoint.\n";
   }
   if (_sdf->HasElement("elevator_name"))
   {
@@ -247,8 +260,10 @@ void LiftDragPluginWhole::Load(physics::ModelPtr _model,
     this->elevatorJoint = this->model->GetJoint(elevatorJointName);
     if (!this->elevatorJoint)
     {
-      gzerr << "Joint with name[" << elevatorJoint << "] does not exist.\n";
+      gzerr << "Joint with name[" << elevatorJointName << "] does not exist.\n";
     }
+    else
+      gzerr << "Joint [" << elevatorJointName << "] connected as elevatorJoint.\n";
   }
 
   if (_sdf->HasElement("rudder_name"))
@@ -259,6 +274,8 @@ void LiftDragPluginWhole::Load(physics::ModelPtr _model,
     {
       gzerr << "Joint with name[" << rudderJoint << "] does not exist.\n";
     }
+    else
+      gzerr << "Joint [" << rudderJointName << "] connected as rudderJoint.\n";
   }
 
   if (_sdf->HasElement("verbose"))
@@ -378,11 +395,19 @@ void LiftDragPluginWhole::OnUpdate()
   double q_LD = 0.5 * this->rho * speedInLDPlane * speedInLDPlane;
   double q_SD = 0.5 * this->rho * speedInSDPlane * speedInSDPlane;
 
+double dal;
+double dar;
+double de;
+double dr;
+
 #if GAZEBO_MAJOR_VERSION >= 9
+  if(this->lAileronJoint && this->rAileronJoint && this->elevatorJoint && this->rudderJoint)
+  {
     dal = this->lAileronJoint->Position(0);
     dar = this->rAileronJoint->Position(0);
     de = this->elevatorJoint->Position(0);
     dr = this->rudderJoint->Position(0);
+  }
 #else
     dal = this->lAileronJoint->GetAngle(0).Radian();
     dar = this->rAileronJoint->GetAngle(0).Radian();
@@ -394,18 +419,18 @@ void LiftDragPluginWhole::OnUpdate()
   double cl = 0;
   if(fabs(this->alpha) <= this->alphaStall)
   {
-    cl = this->cla * this->alpha + this->cl0 + this->clda * (this->dal + this->dar) + this->clde * this->de;
+    cl = this->cla * this->alpha + this->cl0 + this->clda * (dal + dar) + this->clde * de;
   }
   else if(this->alpha > this->alphaStall)
   {
     gzdbg << "Too high stall\n";
-    cl = this->cla * this->alphaStall + this->cl0 + this->clda * (this->dal + this->dar) + this->clde * this->de;
+    cl = this->cla * this->alphaStall + this->cl0 + this->clda * (dal + dar) + this->clde * de;
     cl += this->claStall * (this->alpha - this->alphaStall);
   }
   else
   {
     gzdbg << "Too low stall\n";
-    cl = this->cla * this->alphaStall + this->cl0 + this->clda * (this->dal + this->dar) + this->clde * this->de;
+    cl = this->cla * this->alphaStall + this->cl0 + this->clda * (dal + dar) + this->clde * de;
     cl += this->claStall * (this->alpha + this->alphaStall); 
   }
 
@@ -438,7 +463,7 @@ void LiftDragPluginWhole::OnUpdate()
     this->cma2*alpha2 +
     this->cma1*this->alpha +
     this->cma0 +
-    this->cmda * (this->dal + this->dar) + this->cmde * this->de;
+    this->cmda * (dal + dar) + this->cmde * de;
   }
   else if(this->alpha > this->alphaStall)
   {
@@ -456,7 +481,7 @@ void LiftDragPluginWhole::OnUpdate()
     this->cma2*alpha2 +
     this->cma1*this->alphaStall +
     this->cma0 +
-    this->cmda * (this->dal + this->dar) + this->cmde * this->de;
+    this->cmda * (dal + dar) + this->cmde * de;
 
     cm += this->cmaStall*(this->alpha-this->alphaStall);
   }
@@ -476,20 +501,21 @@ void LiftDragPluginWhole::OnUpdate()
     this->cma2*alpha2 +
     this->cma1*this->alphaStall +
     this->cma0 +
-    this->cmda * (this->dal + this->dar) + this->cmde * this->de;
+    this->cmda * (dal + dar) + this->cmde * de;
 
     cm  += this->cmaStall*(this->alpha+this->alphaStall);
   }
 
   ignition::math::Vector3d omega = this->link->RelativeAngularVel();
   double P = omega[0]; //Roll rate
+  double R = omega[3]; //Yaw rate
 
   // roll moment coefficient due to aileron deflections, roll rate, sideslip 
   double cr;
-  cr = this->crda * (this->dal - this->dar) + this->crp*P*this->span/(2*speedInLDPlane) + this->crb*this->beta;
+  cr = this->crda * (dal - dar) + this->crp*P*this->span/(2*speedInLDPlane) + this->crb*this->beta;
 
   double cn;
-  cn = this->cndr * this->dr + this->cnb * this->beta;
+  cn = this->cndr * dr + this->cnb * this->beta + this->cnr*R*this->span/(2*speedInLDPlane);
 
   // compute moments (torque) at cp
   ignition::math::Vector3d pitchMoment = cm * q_LD * this->area * this->chord * pitchMomentDirection;
@@ -532,10 +558,10 @@ void LiftDragPluginWhole::OnUpdate()
     gzdbg << "cm: " << cm << "\n";
     gzdbg << "cr: " << cr << "\n";
     gzdbg << "cn: " << cn << "\n";
-    gzdbg << "dal: " << this->dal << "\n";
-    gzdbg << "dar: " << this->dar << "\n";
-    gzdbg << "de: " << this->de << "\n";
-    gzdbg << "dr: " << this->dr << "\n";
+    gzdbg << "dal: " << dal << "\n";
+    gzdbg << "dar: " << dar << "\n";
+    gzdbg << "de: " << de << "\n";
+    gzdbg << "dr: " << dr << "\n";
     gzdbg << "omega: " << omega << "\n";
     gzdbg << "pitchMoment: " << pitchMoment << "\n";
     gzdbg << "pitchMomentDirection: " << pitchMomentDirection << "\n";

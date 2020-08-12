@@ -115,6 +115,9 @@ namespace gazebo
     // Yaw moment coefficient for sideslip
     protected: double cnb;
 
+    // Yaw moment coefficient for yaw rate (yaw damping derivative)
+    protected: double cnr;
+
     // Yaw moment coefficient for rudder deflection
     protected: double cndr;
 

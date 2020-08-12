@@ -46,6 +46,7 @@ tot_cla = 0
 tot_cma = 0
 tot_cyb = 0
 tot_cnb = 0
+tot_cnr = 0
 tot_crb = 0
 tot_crp = 0
 tot_cl0 = 0
@@ -93,13 +94,9 @@ for airfoil in airfoils:
 	cma_fus += r_cog_cp[0]*cla_fus
 	cnb_fus += r_cog_cp[0]*cyb_fus
 	cm0_fus += r_cog_cp[0]*cl0_fus
-	# print('pos_cg, pos_cp: ' + str(cog_pos) + ', ' + str(pos))
-	# print('r_cog_cp ' + str(r_cog_cp))
-	# print('cl0_fus %f' % cl0_fus)
-	# print('adding to cm0 %f' % (r_cog_cp[0]*cl0_fus))
 
 	# roll damping derivative (roll moment coefficient contribution due to roll rate)
-	roll_arm = r_cog_cp
+	roll_arm = r_cog_cp.copy()
 	roll_arm[0] = 0
 	roll_armI = roll_arm/np.linalg.norm(roll_arm) 
 	crp_fus = -2*cla_foil*abs(np.dot(spanI,roll_armI))*np.linalg.norm(roll_arm)**2
@@ -107,11 +104,29 @@ for airfoil in airfoils:
 	# dihedral derivative
 	crb_fus = -cyb_fus*r_cog_cp[2]
 
+	# yaw damping derivative
+	cnr_fus = -2*cnb_fus*r_cog_cp[0]
+
+	radtocl = float(airfoil.find(".//control_joint_rad_to_cL").text)*area
+	radtocm = float(airfoil.find(".//control_joint_rad_to_cm").text)*area
+	if airfoil.attrib['name'] == 'htail':
+		clde = -radtocl*abs(np.dot(spanI,[0,-1,0]))
+		cmde = -radtocm*abs(np.dot(spanI,[0,-1,0])) + r_cog_cp[0]*clde
+	elif airfoil.attrib['name'] == 'vtail':
+		cydr = radtocl*abs(np.dot(spanI,[0,0,1]))
+		cndr = radtocm*abs(np.dot(spanI,[0,0,1])) + r_cog_cp[0]*cydr
+	elif airfoil.attrib['name'] == 'wing_right':
+		clda = radtocl*abs(np.dot(spanI,[0,-1,0]))
+		cmda = radtocm*abs(np.dot(spanI,[0,-1,0])) + r_cog_cp[0]*clda
+		crda = -r_cog_cp[1]*clda
+	# Assume left and right wings are the same
+
 	# Add weighted coefficients for this wing to the running total of the aircraft
 	tot_cla += cla_fus*area
 	tot_cma += cma_fus*area
 	tot_cyb += cyb_fus*area
 	tot_cnb += cnb_fus*area
+	tot_cnr += cnr_fus*area
 	tot_cl0 += cl0_fus*area
 	tot_cm0 += cm0_fus*area
 	tot_crp += crp_fus*area
@@ -125,10 +140,19 @@ cla = tot_cla/tot_area
 cma = tot_cma/tot_area
 cyb = tot_cyb/tot_area
 cnb = tot_cnb/tot_area
+cnr = tot_cnr/tot_area
 cl0 = tot_cl0/tot_area
 cm0 = tot_cm0/tot_area
 crp = tot_crp/tot_area
 crb = tot_crb/tot_area
+
+clde = clde/tot_area
+cmde = cmde/tot_area
+cydr = cydr/tot_area
+cndr = cndr/tot_area
+clda = clda/tot_area
+cmda = cmda/tot_area
+crda = crda/tot_area
 
 # Place element in tree for the liftdrag plugin that summarize whole vehicle aerodynamics
 plugin = ET.SubElement(root.find(".//model[@name='" + model_name + "']"),'plugin')
@@ -150,8 +174,17 @@ setsub('cd_c',str(cd0_wing + kcDcL*cl0_wing**2))
 setsub('cma1',str(cma))
 setsub('cma0',str(cm0))
 setsub('cnb',str(cnb))
+setsub('cnr',str(cnr))
 setsub('crp',str(crp))
 setsub('crb',str(crb))
+
+setsub('clde',str(clde))
+setsub('cmde',str(cmde))
+setsub('cndr',str(cndr))
+setsub('clda',str(clda))
+setsub('cmda',str(cmda))
+setsub('crda',str(crda))
+
 setsub('chord',str(1))
 setsub('alpha_stall',alpha_stall)
 setsub('cma_stall',cma_stall)
